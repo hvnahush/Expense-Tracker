@@ -3,13 +3,14 @@ import { getAuth } from 'firebase/auth';
 import {  collection, getDocs, query, where, doc, setDoc } from 'firebase/firestore';
 import { db } from '../Signup/Config';
 import './Profile.css'; 
+import { useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
   const auth = getAuth();
   const user = auth.currentUser;
   const [fullname, setFullName] = useState('');
   const [photourl, setPhotoUrl] = useState('');
-
+  const navigate =useNavigate()
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
@@ -37,6 +38,7 @@ const UserProfile = () => {
       }, { merge: true });
       console.log(fullname);
       console.log(photourl);
+      navigate('/home')
     } catch (error) {
       console.log(error);
     }
