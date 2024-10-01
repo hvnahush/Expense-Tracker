@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { auth } from '../Signup/Config' // Adjust the path as necessary
+import { auth } from '../Signup/Config'; // Adjust the path as necessary
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useUser } from '../Context/UserProvider'; // Import the context
 import { useNavigate } from 'react-router-dom';
+import './Login.css'; // Import the CSS file
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -32,13 +33,18 @@ const Login = () => {
 
   return (
     <div className='login'>
-      <h1>LOGIN</h1>
-      <form onSubmit={handleSubmit}>
-        <input type='email' placeholder='Email Address' value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type='password' placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} required />
-        {error && <p className='error'>{error}</p>}
-        <button type='submit'>Login</button>
-      </form>
+      <div className='login-container'>
+        <h1>LOGIN</h1>
+        <form onSubmit={handleSubmit} className='login-field'>
+          <input type='email' placeholder='Email Address' value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type='password' placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} required />
+          {error && <p className='error'>{error}</p>}
+          <button type='submit'>Login</button>
+        </form>
+        <p className='login-login'>
+          Don't have an account? <span onClick={() => navigate('/signup')}>Sign Up</span>
+        </p>
+      </div>
     </div>
   );
 };
