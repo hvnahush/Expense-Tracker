@@ -1,29 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { useUser } from '../Context/UserProvider';
-import { getAuth, sendEmailVerification } from 'firebase/auth';
-import './Home.css'; // Import the CSS file
+import React, { useEffect, useState } from "react";
+import { useUser } from "../Context/UserProvider";
+import { getAuth, sendEmailVerification } from "firebase/auth";
+import "./Home.css"; // Import the CSS file
 
 const Home = () => {
   const { userId } = useUser(); // Access userId from context
   const [emailVerified, setEmailVerified] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [expenses, setExpenses] = useState([]); // State to store expenses
-  const [amount, setAmount] = useState(''); // State for expense amount
-  const [description, setDescription] = useState(''); // State for expense description
-  const [category, setCategory] = useState(''); // State for expense category
+  const [amount, setAmount] = useState(""); // State for expense amount
+  const [description, setDescription] = useState(""); // State for expense description
+  const [category, setCategory] = useState(""); // State for expense category
+  const [editingExpenseId, setEditingExpenseId] = useState(null); // State to track the expense being edited
   const auth = getAuth();
 
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await fetch('https://expense-tracker-3da9f-default-rtdb.firebaseio.com/expenses.json');
+        const response = await fetch(
+          "https://expense-tracker-3da9f-default-rtdb.firebaseio.com/expenses.json"
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch expenses');
+          throw new Error("Failed to fetch expenses");
         }
         const data = await response.json();
         const loadedExpenses = [];
 
-        // Transforming the data into an array of expenses
         for (const key in data) {
           loadedExpenses.push({ id: key, ...data[key] });
         }
@@ -46,7 +48,7 @@ const Home = () => {
     if (user) {
       try {
         await sendEmailVerification(user);
-        alert('Verification email sent! Please check your inbox.');
+        alert("Verification email sent! Please check your inbox.");
       } catch (err) {
         setError(err.message);
       }
@@ -57,33 +59,87 @@ const Home = () => {
     e.preventDefault();
     if (amount && description && category) {
       const newExpense = { amount, description, category };
-      
-      try {
-        // POST request to Firebase Realtime Database
-        const response = await fetch('https://expense-tracker-3da9f-default-rtdb.firebaseio.com/expenses.json', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newExpense),
-        });
 
-        if (!response.ok) {
-          throw new Error('Failed to add expense');
+      try {
+        let response;
+        if (editingExpenseId) {
+          // Update existing expense
+          response = await fetch(
+            `https://expense-tracker-3da9f-default-rtdb.firebaseio.com/expenses/${editingExpenseId}.json`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(newExpense),
+            }
+          );
+
+          setExpenses((prevExpenses) =>
+            prevExpenses.map((expense) =>
+              expense.id === editingExpenseId
+                ? { ...expense, ...newExpense }
+                : expense
+            )
+          );
+        } else {
+          // Create new expense
+          response = await fetch(
+            "https://expense-tracker-3da9f-default-rtdb.firebaseio.com/expenses.json",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(newExpense),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to add expense");
+          }
+
+          const responseData = await response.json();
+          setExpenses((prevExpenses) => [
+            ...prevExpenses,
+            { id: responseData.name, ...newExpense },
+          ]);
         }
 
-        // Optionally: Update local expenses state if needed
-        setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
-
         // Reset fields
-        setAmount('');
-        setDescription('');
-        setCategory('');
+        setAmount("");
+        setDescription("");
+        setCategory("");
+        setEditingExpenseId(null); // Reset editing state
       } catch (error) {
         setError(error.message);
       }
     } else {
-      setError('Please fill out all fields.');
+      setError("Please fill out all fields.");
+    }
+  };
+
+  const handleEditExpense = (expense) => {
+    setAmount(expense.amount);
+    setDescription(expense.description);
+    setCategory(expense.category);
+    setEditingExpenseId(expense.id); // Set the expense being edited
+  };
+
+  const handleDeleteExpense = async (id) => {
+    try {
+      await fetch(
+        `https://expense-tracker-3da9f-default-rtdb.firebaseio.com/expenses/${id}.json`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      setExpenses((prevExpenses) =>
+        prevExpenses.filter((expense) => expense.id !== id)
+      );
+    } catch (error) {
+      setError("Failed to delete expense");
     }
   };
 
@@ -116,8 +172,14 @@ const Home = () => {
                   />
                 </div>
                 <div>
-                  <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-                    <option value="" disabled>Select category</option>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select category
+                    </option>
                     <option value="Food">Food</option>
                     <option value="Petrol">Petrol</option>
                     <option value="Salary">Salary</option>
@@ -125,7 +187,9 @@ const Home = () => {
                     <option value="Other">Other</option>
                   </select>
                 </div>
-                <button type="submit" className='expense-button'>Add Expense</button>
+                <button type="submit" className="expense-button">
+                  {editingExpenseId ? "Update Expense" : "Add Expense"}
+                </button>
                 {error && <p className="error">{error}</p>}
               </form>
 
@@ -136,8 +200,25 @@ const Home = () => {
                 ) : (
                   <ul>
                     {expenses.map((expense) => (
-                      <li key={expense.id}>
-                        {expense.amount} - {expense.description} ({expense.category})
+                      <li key={expense.id} className="expense-item">
+                        <div className="expense-details">
+                          {expense.amount} - {expense.description} (
+                          {expense.category})
+                        </div>
+                        <div className="expense-actions">
+                          <button
+                            onClick={() => handleEditExpense(expense)}
+                            className="edit-button"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteExpense(expense.id)}
+                            className="delete-button"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -148,7 +229,10 @@ const Home = () => {
             <div className="verification-message">
               <span>Please verify your email to complete your profile.</span>
               <div className="verification-actions">
-                <button onClick={sendVerificationEmail} className="verification-button">
+                <button
+                  onClick={sendVerificationEmail}
+                  className="verification-button"
+                >
                   Resend Verification Email
                 </button>
                 {error && <p className="error">{error}</p>}

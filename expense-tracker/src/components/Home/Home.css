@@ -109,3 +109,50 @@ li {
   width: 200px;
   margin-left: 1px;
 }
+.edit-button {
+  padding: 5px 10px;
+  background-color: #28a745; /* Green color for edit button */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px; /* Space between buttons */
+}
+
+.edit-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+.delete-button {
+  padding: 5px 10px;
+  background-color: #dc3545; /* Red color for delete button */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px; /* Space between buttons */
+}
+
+.delete-button:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+.expense-item {
+  display: flex;
+  justify-content: space-between; /* Distributes space between items */
+  align-items: center; /* Vertically center-aligns items */
+  background: #e9ecef;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 4px;
+}
+
+.expense-details {
+  flex-grow: 1; /* Allows the details to take up remaining space */
+}
+
+.expense-actions {
+  display: flex; /* Arrange buttons in a row */
+  gap: 10px; /* Space between buttons */
+}
