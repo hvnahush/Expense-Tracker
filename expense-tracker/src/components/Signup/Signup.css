@@ -1,0 +1,80 @@
+body, html {
+    height: 100%; /* Ensure the body takes the full height */
+    margin: 0; /* Remove default margin */
+}
+
+.signup {
+    display: flex; /* Use Flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Full viewport height */
+}
+
+.signup-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.signup-field {
+    display: grid;
+    gap: 10px;
+}
+
+.signup input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+
+input:focus {
+    border-color: #f44336;
+    outline: none;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #f44336;
+    color: white;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background: #d32f2f;
+}
+
+button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.signup-login {
+    text-align: center;
+}
+
+.signup-login span {
+    color: #f44336;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+::placeholder {
+    color: #888;
+}
+
+@media (max-width: 600px) {
+    .signup-container {
+        padding: 20px;
+        max-width: 90%;
+    }
+}
