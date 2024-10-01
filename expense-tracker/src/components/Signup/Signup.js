@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import { auth } from './Config'; // Adjust the path as necessary
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import './Signup.css';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../Context/UserProvider'; // Import useUser
+import './Signup.css';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate =useNavigate()
+  const navigate = useNavigate();
+  const { setUserId } = useUser(); // Get setUserId from context
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the default form submission
+    e.preventDefault();
 
     if (!email || !password || !confirmPassword) {
       setError('All fields are mandatory.');
@@ -25,17 +27,18 @@ const Signup = () => {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid; // Get the user ID
+      setUserId(userId); // Set user ID in context
       console.log('User has successfully signed up: ' + email);
       navigate('/login');
-   
     } catch (err) {
       setError(err.message);
     }
   };
 
   const handleLogin = () => {
-    navigate('/login')
+    navigate('/login');
   };
 
   return (

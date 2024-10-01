@@ -1,0 +1,8 @@
+.home {
+    display: flex;
+    justify-content: space-between; /* Positions items on opposite sides */
+    align-items: center; /* Centers items vertically */
+    padding: 20px; /* Adds some padding */
+  }
+  
+ 

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import './Login.css';
-import { auth } from '../Signup/Config'; 
+import { auth } from '../Signup/Config' // Adjust the path as necessary
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useUser } from '../Context/UserProvider'; // Import the context
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { setUserId } = useUser(); // Get setUserId from context
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -19,46 +20,25 @@ const Login = () => {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('User logged in successfully: ' + email);
-      navigate('/home'); 
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid; // Get user ID
+      setUserId(userId); // Set user ID in context
+      console.log('User logged in successfully:', userId);
+      navigate('/home'); // Navigate to home
     } catch (err) {
-      setError(err.message); 
+      setError(err.message);
     }
-  };
-
-  const handleSignup = () => {
-    navigate('/signup');
   };
 
   return (
     <div className='login'>
-      <div className='login-container'>
-        <h1>LOGIN</h1>
-        <form onSubmit={handleSubmit}>
-          <div className='login-field'>
-            <input
-              type='email'
-              placeholder='Email Address'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type='password'
-              placeholder='Password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && <p className='error'>{error}</p>} {/* Display error message */}
-          <button type='submit'>Login</button>
-        </form>
-        <p className='login-login'>
-          Don't have an account? <span onClick={handleSignup}>Signup here</span>
-        </p>
-      </div>
+      <h1>LOGIN</h1>
+      <form onSubmit={handleSubmit}>
+        <input type='email' placeholder='Email Address' value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type='password' placeholder='Password' value={password} onChange={(e) => setPassword(e.target.value)} required />
+        {error && <p className='error'>{error}</p>}
+        <button type='submit'>Login</button>
+      </form>
     </div>
   );
 };
