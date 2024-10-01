@@ -7,6 +7,7 @@ import Login from './components/Login/Login';
 import Home from './components/Home/Home';
 import Profile from './components/Profile/Profile';
 import Navbar from './components/Navbar/Navbar';
+import Forgotpassword from './components/Password/Forgotpassword';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/password" element={<Forgotpassword/>} />
         <Route path="/profile/:userId" element={<Profile />} /> 
       </Routes>
     </UserProvider>
